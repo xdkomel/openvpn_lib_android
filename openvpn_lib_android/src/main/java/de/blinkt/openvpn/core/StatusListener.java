@@ -5,6 +5,7 @@
 
 package de.blinkt.openvpn.core;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.ApplicationExitInfo;
 import android.content.ComponentName;
@@ -130,10 +131,12 @@ public class StatusListener implements VpnStatus.LogListener {
         c.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         this.mContext = c;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             logLatestExitReasons(c);
+        }
     }
 
+    @SuppressLint("NewApi")
     @RequiresApi(Build.VERSION_CODES.R)
     private void logLatestExitReasons(Context c) {
         ActivityManager activityManager = (ActivityManager) c.getSystemService(Context.ACTIVITY_SERVICE);
@@ -154,6 +157,8 @@ public class StatusListener implements VpnStatus.LogListener {
 
     }
 
+    @SuppressLint("NewApi")
+    @RequiresApi(Build.VERSION_CODES.R)
     private void logExitNotification(ApplicationExitInfo aei, String s) {
         if (aei != null) {
             LogItem li = new LogItem(LogLevel.DEBUG, s + aei, aei.getTimestamp());

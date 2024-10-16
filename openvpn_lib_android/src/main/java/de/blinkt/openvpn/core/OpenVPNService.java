@@ -5,6 +5,7 @@
 
 package de.blinkt.openvpn.core;
 
+import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE;
 import static de.blinkt.openvpn.core.ConnectionStatus.LEVEL_CONNECTED;
 import static de.blinkt.openvpn.core.ConnectionStatus.LEVEL_WAITING_FOR_USER_INPUT;
 import static de.blinkt.openvpn.core.NetworkSpace.IpAddress;
@@ -26,6 +27,7 @@ import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.ProxyInfo;
 import android.net.VpnService;
+import android.net.IpPrefix;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -327,7 +329,11 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
 
         mNotificationManager.notify(notificationId, notification);
 
-        startForeground(notificationId, notification);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            startForeground(notificationId, notification);
+        } else {
+            startForeground(notificationId, notification, FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
+        }
 
         if (lastChannel != null && !channel.equals(lastChannel)) {
             // Cancel old notification
@@ -959,6 +965,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private void installRoutesExcluded(Builder builder, NetworkSpace routes)
     {
         for(IpAddress ipIncl: routes.getNetworks(true))

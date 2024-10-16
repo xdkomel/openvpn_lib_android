@@ -327,13 +327,8 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
 
         int notificationId = channel.hashCode();
 
+        startForegroundRuntimeCheck();
         mNotificationManager.notify(notificationId, notification);
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            startForeground(notificationId, notification);
-        } else {
-            startForeground(notificationId, notification, FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
-        }
 
         if (lastChannel != null && !channel.equals(lastChannel)) {
             // Cancel old notification
@@ -354,6 +349,15 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
                 mlastToast = Toast.makeText(getBaseContext(), toastText, Toast.LENGTH_SHORT);
                 mlastToast.show();
             });
+    }
+
+    private void startForegroundRuntimeCheck(int notificationId, Notification notification) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            startForeground(notificationId, notification);
+        } else {
+            startForeground(notificationId, notification, FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
+        }
+
     }
 
     private void lpNotificationExtras(Notification.Builder nbuilder, String category) {

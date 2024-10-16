@@ -327,7 +327,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
 
         int notificationId = channel.hashCode();
 
-        startForegroundRuntimeCheck();
+        startForegroundRuntimeCheck(notificationId, notification);
         mNotificationManager.notify(notificationId, notification);
 
         if (lastChannel != null && !channel.equals(lastChannel)) {
@@ -357,7 +357,6 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         } else {
             startForeground(notificationId, notification, FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
         }
-
     }
 
     private void lpNotificationExtras(Notification.Builder nbuilder, String category) {

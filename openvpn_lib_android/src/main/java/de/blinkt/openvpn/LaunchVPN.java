@@ -240,34 +240,34 @@ public class LaunchVPN extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != START_VPN_PROFILE) { 
+            return;
+        }
+        if (resultCode == Activity.RESULT_OK) {
+            int needpw = mSelectedProfile.needUserPWInput(mTransientCertOrPCKS12PW, mTransientAuthPW);
+            if (needpw != 0) {
+                VpnStatus.updateStateString("USER_VPN_PASSWORD", "", R.string.state_user_vpn_password,
+                        ConnectionStatus.LEVEL_WAITING_FOR_USER_INPUT);
+                askForPW(needpw);
+            } else {
+                SharedPreferences prefs = Preferences.getDefaultSharedPreferences(this);
+                boolean showLogWindow = prefs.getBoolean("showlogwindow", true);
 
-        if (requestCode == START_VPN_PROFILE) {
-            if (resultCode == Activity.RESULT_OK) {
-                int needpw = mSelectedProfile.needUserPWInput(mTransientCertOrPCKS12PW, mTransientAuthPW);
-                if (needpw != 0) {
-                    VpnStatus.updateStateString("USER_VPN_PASSWORD", "", R.string.state_user_vpn_password,
-                            ConnectionStatus.LEVEL_WAITING_FOR_USER_INPUT);
-                    askForPW(needpw);
-                } else {
-                    SharedPreferences prefs = Preferences.getDefaultSharedPreferences(this);
-                    boolean showLogWindow = prefs.getBoolean("showlogwindow", true);
-
-                    if (!mhideLog && showLogWindow)
-                        showLogWindow();
-                    ProfileManager.updateLRU(this, mSelectedProfile);
-                    VPNLaunchHelper.startOpenVpn(mSelectedProfile, getBaseContext(), mSelectedProfileReason);
-                    finish();
-                }
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                // User does not want us to start, so we just vanish
-                VpnStatus.updateStateString("USER_VPN_PERMISSION_CANCELLED", "", R.string.state_user_vpn_permission_cancelled,
-                        ConnectionStatus.LEVEL_NOTCONNECTED);
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                    VpnStatus.logError(R.string.nought_alwayson_warning);
-
+                if (!mhideLog && showLogWindow)
+                    showLogWindow();
+                ProfileManager.updateLRU(this, mSelectedProfile);
+                VPNLaunchHelper.startOpenVpn(mSelectedProfile, getBaseContext(), mSelectedProfileReason);
                 finish();
             }
+        } else if (resultCode == Activity.RESULT_CANCELED) {
+            // User does not want us to start, so we just vanish
+            VpnStatus.updateStateString("USER_VPN_PERMISSION_CANCELLED", "", R.string.state_user_vpn_permission_cancelled,
+                    ConnectionStatus.LEVEL_NOTCONNECTED);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                VpnStatus.logError(R.string.nought_alwayson_warning);
+
+            finish();
         }
     }
 
